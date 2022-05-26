@@ -14,10 +14,14 @@ public class CapturetheFlag : MonoBehaviour
     int fireRate = 3;
     int layerMask = 1 << 8;
     bool isCrouching;
+    [SerializeField] GameObject flagHolder, flagSpawn;
     public CharacterController characterController;
     //List<GameObject> ammoList = new List<GameObject>();
-    public int health = 25;
-
+    public float health = 25;
+    int maxHealth = 25;
+    float flagToSpawn = 15f;
+    bool flagSitting = false;
+    public float timeforHealthRegain = 5f;
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +31,7 @@ public class CapturetheFlag : MonoBehaviour
         getFlag = false;
         getGoal = false;
         isShooting = false;
+        flagSitting = false;
     }
 
     // Update is called once per frame
@@ -36,8 +41,26 @@ public class CapturetheFlag : MonoBehaviour
         {
             Debug.Log("You Died");
             //respawn?
+            if (getFlag)
+            {
+                flagHolder.transform.position = gameObject.transform.position;
+                flagSitting = true;
+            }
             GM.PlayerDied();
+            getFlag = false;
+            flagHolder.SetActive(true);
             health = 25;
+        }
+        if (flagSitting)
+        {
+            Debug.Log("Flag still in play!");
+            flagToSpawn -= Time.deltaTime;
+            if(flagToSpawn < 0)
+            {
+                flagSitting = false;
+                flagToSpawn = 15f;
+                flagHolder.transform.position = flagSpawn.transform.position;
+            }
         }
         if (Input.GetButtonDown("Fire1"))
         {
@@ -65,12 +88,23 @@ public class CapturetheFlag : MonoBehaviour
                 characterController.height *= 2;
             }
         }
+        if(health < maxHealth)
+        {
+            timeforHealthRegain -= Time.deltaTime;
+            if(timeforHealthRegain <= 0)
+            {
+                health += Time.deltaTime * 5;
+            }
+        }
+        
     }
     private void OnTriggerEnter(Collider other)
     {
         if(other.tag == "Flag")
         {
             getFlag = true;
+            flagSitting = false;
+            flagToSpawn = 15f;
             other.gameObject.SetActive(false);
         }
         if(other.tag == "Goal" && getFlag == true)
@@ -96,24 +130,26 @@ public class CapturetheFlag : MonoBehaviour
     void Fire()
     {
         GM.AmmoNum--;
-        Debug.Log("Pew pew");
+        //Debug.Log("Pew pew");
         AudioClip AD = GM.gunSoundsPlaces[GM.HoldingGun];
         GM.playersource.PlayOneShot(AD);
         //do fancy particles and audio
         RaycastHit hit;
-        if(Physics.Raycast(mainCam.position, mainCam.forward, out hit, 50, layerMask))
+        if(Physics.Raycast(mainCam.position, mainCam.forward, out hit, (GM.gunDamage[GM.HoldingGun] * 6), layerMask))
         {
             //Debug.DrawRay(mainCam.position, mainCam.forward, Color.red, Mathf.Infinity);
             if(hit.collider != null)
             {
                 if(hit.collider.gameObject.tag == "Enemy")
                 {
+                    EnemyMovement em = hit.collider.gameObject.GetComponent<EnemyMovement>();
                     Debug.Log("Hit enemy!");
-                    hit.collider.gameObject.GetComponent<EnemyMovement>().enemyHealth -= 4;
+                    //hit.collider.gameObject.GetComponent<EnemyMovement>().enemyHealth -= 4;
+                    em.enemyHealth -= GM.gunDamage[GM.HoldingGun];
                 }
                 else
                 {
-                    Debug.Log("Hit a wall");
+                    //Debug.Log("Hit a wall");
                     Debug.Log(hit.collider.gameObject.name);
                     //Quaternion impactRotation = Quaternion.LookRotation(hit.normal);
                     //GameObject bH = Instantiate(bulletHole, hit.point, impactRotation);

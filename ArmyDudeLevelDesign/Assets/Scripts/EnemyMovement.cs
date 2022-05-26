@@ -81,7 +81,7 @@ public class EnemyMovement : MonoBehaviour
 
     void EnemyShoot()
     {
-        enemysource.PlayOneShot(enemypow);
+        
         Debug.Log("I'm shooting at the player");
         RaycastHit hit;
         if (Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, range, ~8))
@@ -91,8 +91,12 @@ public class EnemyMovement : MonoBehaviour
             {
                 if (hit.collider.gameObject.tag == "Player")
                 {
+                    CapturetheFlag ctf = hit.collider.gameObject.GetComponent<CapturetheFlag>();
                     Debug.Log("Hit the player!");
-                    hit.collider.gameObject.GetComponent<CapturetheFlag>().health -= 5;
+                    enemysource.PlayOneShot(enemypow);
+                    ctf.health -= 5;
+                    ctf.timeforHealthRegain = 5f;
+                    
                 }
                 else
                 {

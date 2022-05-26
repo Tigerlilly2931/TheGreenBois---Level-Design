@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     public GameObject player, canvastxt, specCam, raspawn;
     [SerializeField] GameObject Pistol, Sniper, SMG, Shotgun;
     Dictionary<int, GameObject> gunPlaces = new Dictionary<int, GameObject>();
+    public Dictionary<int, int> gunDamage = new Dictionary<int, int>();
     public Dictionary<int, AudioClip> gunSoundsPlaces = new Dictionary<int, AudioClip>();
     public int HoldingGun = 0;
     public int totalGuns = 0;
@@ -31,6 +32,7 @@ public class GameManager : MonoBehaviour
         canvastxt.SetActive(false);
         specCam.SetActive(false);
         gunPlaces.Add(0, Pistol);
+        gunDamage.Add(0, 3);
         gunSoundsPlaces.Add(0, pistolPew);
         AmmoNum = 30;
         totalGuns = 0;
@@ -145,6 +147,7 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Picked up the SMG");
                     gunPlaces.Add(totalGuns, SMG);
                     gunSoundsPlaces.Add(totalGuns, SMGRattatat);
+                    gunDamage.Add(totalGuns, 4);
                     break;
                 }
             case "Shotgun":
@@ -152,6 +155,7 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Picked up the Shotgun");
                     gunPlaces.Add(totalGuns, Shotgun);
                     gunSoundsPlaces.Add(totalGuns, shotgunBOOM);
+                    gunDamage.Add(totalGuns, 8);
                     break;
                 }
             case "Sniper":
@@ -159,6 +163,7 @@ public class GameManager : MonoBehaviour
                     Debug.Log("Picked up the Sniper");
                     gunPlaces.Add(totalGuns, Sniper);
                     gunSoundsPlaces.Add(totalGuns, sniperPow);
+                    gunDamage.Add(totalGuns, 10);
                     break;
                 }
             default:
