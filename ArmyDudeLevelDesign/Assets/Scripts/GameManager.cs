@@ -12,7 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] Text playerHealthTxt;
     public GameObject player, canvastxt, specCam, raspawn;
     [SerializeField] GameObject Pistol, Sniper, SMG, Shotgun;
-    Dictionary<int, GameObject> gunPlaces = new Dictionary<int, GameObject>();
+    public Dictionary<int, GameObject> gunPlaces = new Dictionary<int, GameObject>();
     public Dictionary<int, int> gunDamage = new Dictionary<int, int>();
     public Dictionary<int, AudioClip> gunSoundsPlaces = new Dictionary<int, AudioClip>();
     public int HoldingGun = 0;

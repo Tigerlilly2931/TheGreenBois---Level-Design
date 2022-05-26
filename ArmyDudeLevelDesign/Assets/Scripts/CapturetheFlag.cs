@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityStandardAssets.Characters.FirstPerson;
 
 public class CapturetheFlag : MonoBehaviour
 {
@@ -11,20 +12,24 @@ public class CapturetheFlag : MonoBehaviour
     bool isShooting;
     public Transform mainCam;
     float fireTime = 0;
-    int fireRate = 3;
+    int fireRate = 2;
     int layerMask = 1 << 8;
     bool isCrouching;
     [SerializeField] GameObject flagHolder, flagSpawn;
     public CharacterController characterController;
+    public FirstPersonController firstPersonController;
+    [SerializeField] GameObject bulletHole;
     //List<GameObject> ammoList = new List<GameObject>();
     public float health = 25;
     int maxHealth = 25;
     float flagToSpawn = 15f;
     bool flagSitting = false;
     public float timeforHealthRegain = 5f;
+    bool isWalking;
     // Start is called before the first frame update
     void Start()
     {
+        isWalking = false;
         isCrouching = false;
         layerMask = ~layerMask;
         GM = FindObjectOfType<GameManager>();
@@ -50,6 +55,23 @@ public class CapturetheFlag : MonoBehaviour
             getFlag = false;
             flagHolder.SetActive(true);
             health = 25;
+        }
+        if(firstPersonController.desiredMove != Vector3.zero)
+        {
+            isWalking = true;
+            
+        }
+        else
+        {
+            isWalking = false;
+        }
+        if (isWalking)
+        {
+            GM.gunPlaces[GM.HoldingGun].GetComponent<Animator>().SetBool("walking", true);
+        }
+        else
+        {
+            GM.gunPlaces[GM.HoldingGun].GetComponent<Animator>().SetBool("walking", false);
         }
         if (flagSitting)
         {
@@ -129,6 +151,7 @@ public class CapturetheFlag : MonoBehaviour
 
     void Fire()
     {
+        GM.gunPlaces[GM.HoldingGun].GetComponent<Animator>().SetTrigger("shooting");
         GM.AmmoNum--;
         //Debug.Log("Pew pew");
         AudioClip AD = GM.gunSoundsPlaces[GM.HoldingGun];
@@ -150,10 +173,10 @@ public class CapturetheFlag : MonoBehaviour
                 else
                 {
                     //Debug.Log("Hit a wall");
-                    Debug.Log(hit.collider.gameObject.name);
-                    //Quaternion impactRotation = Quaternion.LookRotation(hit.normal);
-                    //GameObject bH = Instantiate(bulletHole, hit.point, impactRotation);
-                    //Destroy(bH, 5f);
+                    /*Debug.Log(hit.collider.gameObject.name);
+                    Quaternion impactRotation = Quaternion.LookRotation(hit.normal);
+                    GameObject bH = Instantiate(bulletHole, hit.point, impactRotation);
+                    Destroy(bH, 5f);*/
                 }
             }
         }
